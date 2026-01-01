@@ -1,0 +1,386 @@
+/* VOCAB QUEST - GAME MODULE STYLES */
+
+/* --- Layout Containers --- */
+.game-module {
+    /* Base wrapper handled by GameModule JS (padding-top: 80px) */
+    position: relative;
+    overflow: hidden;
+    /* CRITICAL: Prevent hazards from expanding scroll */
+    width: 100%;
+    height: 100%;
+    /* Ensure flex alignment works */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Main content vertical centering */
+    justify-content: center;
+    /* Main content vertical centering */
+    justify-content: center;
+    /* padding-top: 60px; REMOVED - Handled by Layout.css */
+    /* Topbar clearance */
+    box-sizing: border-box;
+    touch-action: none;
+    /* Disable native scrolling/zooming */
+    overscroll-behavior: none;
+    /* Prevent rubber-banding */
+}
+
+/* --- Game Virtual Keyboard --- */
+.virtual-keyboard {
+    position: relative;
+    /* Was fixed */
+    width: 100%;
+    max-width: 800px;
+    /* Constrain width on desktop */
+    background: transparent;
+    /* Was rgba(0,0,0,0.9) */
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px 10px;
+    align-items: center;
+    z-index: 20;
+    margin-top: 30px;
+}
+
+/* --- Hazard Layer (Asteroids) --- */
+.hazard-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    /* Behind UI */
+    pointer-events: none;
+}
+
+.asteroid-obj {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    font-size: 3rem;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.5s;
+    /* Animation handled by class 'falling' */
+}
+
+.asteroid-obj.falling {
+    opacity: 1;
+    animation: fall linear forwards;
+    /* Duration set in JS usually, default here */
+    animation-duration: 5s;
+}
+
+@keyframes fall {
+    0% {
+        top: -50px;
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        top: 110%;
+        opacity: 0;
+    }
+}
+
+/* --- Target Display (Definition & Slots) --- */
+.target-display {
+    z-index: 20;
+    position: relative;
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+    /* Center horizontally in parent */
+    /* Flexbox Layout for Vertical Distribution */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Center Children Vertically & Horizontally */
+    justify-content: center;
+    gap: 20px;
+}
+
+.definition-panel {
+    /* Desktop: Compact Layout */
+
+    background: rgba(0, 243, 255, 0.05);
+    border: 1px solid var(--neon-cyan);
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    width: 100%;
+    font-size: 1.5rem;
+    color: #fff;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+    transition: border-color 0.3s;
+    margin-bottom: 30px;
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+.retry-container {
+    height: 50px;
+    text-align: center;
+    width: 100%;
+}
+
+/* --- Input Slots --- */
+.input-slots {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    /* Handle long words */
+}
+
+/* Underline Style Slots */
+.slot {
+    width: 40px;
+    height: 50px;
+    border: none;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.8rem;
+    /* Slightly larger text */
+    font-weight: 700;
+    color: #fff;
+    background: transparent;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.slot.prefilled {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    background: transparent;
+}
+
+.slot.active {
+    border-bottom-color: var(--neon-cyan);
+    /* box-shadow removed to prevent box look */
+    text-shadow: 0 0 10px var(--neon-cyan);
+    /* Glow text instead */
+    transform: translateY(-2px);
+    background: transparent;
+}
+
+.slot.filled {
+    border-bottom-color: #fff;
+    color: #fff;
+}
+
+.slot.correct {
+    border-bottom-color: var(--neon-green);
+    color: var(--neon-green);
+    /* box-shadow removed */
+    text-shadow: 0 0 10px var(--neon-green);
+    background: transparent;
+}
+
+.slot.wrong {
+    border-bottom-color: var(--neon-red);
+    color: var(--neon-red);
+    animation: shake 0.4s;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+/* --- Perfect Stamp --- */
+/* --- Floating Reward Text --- */
+.float-text {
+    position: fixed;
+    right: 15%;
+    /* Right side */
+    top: 50%;
+    transform: translateY(0);
+
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--neon-gold);
+    text-shadow: 0 0 10px var(--neon-gold);
+    pointer-events: none;
+    z-index: 100;
+
+    animation: floatUp 1.5s ease-out forwards;
+}
+
+@keyframes floatUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.8);
+    }
+
+    10% {
+        opacity: 1;
+        transform: translateY(0) scale(1.1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-100px) scale(1);
+    }
+}
+
+/* --- Start Overlay --- */
+.start-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 9999;
+    /* Robust Centering */
+    display: grid;
+    place-items: center;
+    align-content: center;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+}
+
+.overlay-title {
+    font-size: 2rem;
+    color: var(--neon-cyan);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.overlay-subtitle {
+    font-size: 1rem;
+    color: var(--text-dim);
+    margin-bottom: 40px;
+}
+
+.overlay-btn {
+    width: auto;
+    padding: 15px 40px;
+    font-size: 1.5rem;
+}
+
+/* --- Feedback --- */
+.feedback-box {
+    min-height: 50px;
+    margin-top: 15px;
+    font-size: 2.5rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px currentColor;
+    text-align: center;
+}
+
+/* --- Virtual Keyboard --- */
+.virtual-keyboard {
+    /* Desktop: Group with Input */
+
+    width: 100%;
+    /* Max width matches target display but we want full width for keyboard often? 
+       Actually target-display is max 600px. Keyboard should probably match that or be full screen width?
+       The mockups imply a "phone-like" keyboard. Let's keep it inside text flow for now.
+    */
+    z-index: 20;
+    /* Above stars */
+    padding-bottom: 20px;
+}
+
+/* --- Mobile Adaptation --- */
+@media (max-width: 768px) {
+    .game-module {
+        justify-content: flex-start;
+        padding-top: 10px;
+        width: 100%;
+        /* Ensure specific height handling if needed, but flex:1 on child works best on flex containers */
+    }
+
+    .target-display {
+        /* Flex Grow is key here */
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        width: 100%;
+        max-width: 100%;
+        padding: 0 15px;
+    }
+
+    /* Push definition to middle-top */
+    .definition-panel {
+        font-size: 1.2rem;
+        padding: 15px;
+        margin-top: auto;
+    }
+
+    .input-slots {
+        gap: 5px;
+        margin-bottom: 10px;
+    }
+
+    .slot {
+        width: 30px;
+        height: 40px;
+        font-size: 1.2rem;
+        border-width: 1px;
+    }
+
+    .virtual-keyboard {
+        /* Push to bottom */
+        margin-top: auto;
+
+        width: 100vw;
+        margin-left: -15px;
+        /* Counteract padding */
+        padding: 10px;
+        gap: 5px;
+        background: rgba(0, 0, 0, 0.9);
+        border-top: 1px solid var(--neon-cyan);
+    }
+
+    .key {
+        height: 45px;
+        font-size: 1rem;
+        border-radius: 4px;
+        min-width: 25px;
+        /* Shrink keys */
+    }
+
+    .perfect-stamp {
+        font-size: 3rem;
+        border-width: 3px;
+        letter-spacing: 2px;
+    }
+
+    #feedback {
+        font-size: 1.5rem !important;
+        min-height: 30px !important;
+    }
+}

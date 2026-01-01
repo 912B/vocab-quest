@@ -1,0 +1,30 @@
+# Binaries
+main
+*.exe
+*.dll
+
+# Database
+vocab.db
+*.db
+*.sqlite
+
+# Logs
+*.log
+server.log
+
+# Config & Secrets
+server_config.json
+cookies.txt
+cookies_*.txt
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+vendor/
+
+# Temporary
+tmp/
+test_verify.sh

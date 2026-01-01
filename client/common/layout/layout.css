@@ -1,0 +1,73 @@
+/* VOCAB QUEST - UNIFIED LAYOUT SYSTEM */
+
+/* 
+   Structure:
+   #app (Root)
+     ├── #topbar (Fixed Header)
+     └── #main-container (Content Area)
+           └── [Module Root]
+*/
+
+/* --- Root Container --- */
+#app {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    /* App Shell itself never scrolls */
+    position: relative;
+    background: #000;
+    /* Fallback */
+}
+
+/* --- Main Content Area --- */
+#main-container {
+    width: 100%;
+    height: 100%;
+
+    /* Topbar Clearance - Global Standard */
+    /* Mobile: 50px, Desktop: 60px */
+    padding-top: 60px;
+
+    box-sizing: border-box;
+    position: relative;
+
+    /* Default Behavior: No Scroll (Game Mode) */
+    overflow: hidden;
+}
+
+/* --- Layout Modes --- */
+
+/* Mode: Scrollable (Auth, Dashboard) */
+#main-container.layout-scrollable {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    /* CRITICAL: Explicitly allow vertical scroll gesture */
+    padding-bottom: 120px;
+    /* Spacing: Large buffer to allow pulling bottom content up */
+}
+
+/* Mode: Locked (Game) */
+#main-container.layout-locked {
+    overflow: hidden;
+    touch-action: none;
+}
+
+/* --- Module Adaptation --- */
+
+/* Modules should generally fill the available space */
+.module-root {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Mobile Breakpoints --- */
+@media (max-width: 768px) {
+    #main-container {
+        padding-top: 50px;
+        /* Reduced Topbar height matching game.css legacy */
+    }
+}

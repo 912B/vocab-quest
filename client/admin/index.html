@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocab Quest - System Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../common/styles/theme.css">
+    <style>
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .sidebar {
+            background: rgba(10, 15, 25, 0.8);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 4px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .main-panel {
+            background: rgba(10, 15, 25, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .nav-item {
+            padding: 10px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            color: var(--text-dim);
+            transition: 0.2s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        /* Dictionary List */
+        .dict-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 3px solid transparent;
+        }
+
+        .dict-item.active {
+            border-left-color: var(--neon-green);
+            background: rgba(0, 255, 157, 0.05);
+        }
+
+        /* Word Table */
+        .word-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+        }
+
+        .word-table th {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        .word-table td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .word-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tag-diff {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-size: 0.8rem;
+            background: #333;
+        }
+
+        /* Mobile Layout */
+        @media (max-width: 768px) {
+            .admin-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .sidebar {
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                padding: 10px;
+                gap: 5px;
+            }
+
+            .sidebar h2 {
+                width: 100%;
+                font-size: 1rem;
+                margin-bottom: 5px;
+            }
+
+            .nav-item {
+                flex: 1;
+                text-align: center;
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+
+            .btn-cyber-secondary {
+                width: auto;
+                padding: 8px 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <h2 style="font-size: 1.2rem; color: var(--neon-gold)">SYSTEM CONTROL</h2>
+            <div id="nav-library" class="nav-item active" onclick="window.router.loadModule('library')">📚 LIBRARY</div>
+            <div id="nav-users" class="nav-item" onclick="window.router.loadModule('users')">👥 USERS</div>
+            <div id="nav-settings" class="nav-item" onclick="alert('Coming Soon')">⚙️ SETTINGS</div>
+
+            <button class="btn-cyber btn-cyber-secondary" style="margin-top:auto" onclick="location.href='/'">EXIT
+                CONSOLE</button>
+        </aside>
+
+        <main class="main-panel" id="content-area">
+            <!-- Dynamic Content -->
+            <div style="display:flex; justify-content:center; align-items:center; height:100%">
+                INITIALIZING ADMIN PROTOCOLS...
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="full-screen hidden"
+        style="position:fixed; top:0; left:0; background:rgba(0,0,0,0.8); z-index:100; padding:10px;">
+        <div class="cyber-card" style="width:100%; max-width:500px">
+            <h3 id="modal-title">EDIT WORD</h3>
+            <input type="text" id="inp-word" class="cyber-input" placeholder="Word (e.g. GALAXY)">
+            <input type="text" id="inp-def" class="cyber-input" placeholder="Definition">
+            <input type="number" id="inp-diff" class="cyber-input" placeholder="Difficulty (1-5)" min="1" max="5">
+
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn-cyber" onclick="saveWord()">SAVE</button>
+                <button class="btn-cyber btn-cyber-secondary" onclick="closeModal()">CANCEL</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="admin.js"></script>
+</body>
+
+</html>

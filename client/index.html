@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vocab Quest - Command Deck</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="common/styles/theme.css">
+    <link rel="stylesheet" href="common/layout/topbar.css">
+    <link rel="stylesheet" href="common/layout/layout.css">
+    <link rel="stylesheet" href="common/styles/game.css">
+</head>
+
+<body>
+    <!-- Global Topbar (Restored) -->
+    <div class="topbar">
+        <a href="#" class="top-brand">
+            <span>🚀</span> <span>VOCAB QUEST</span>
+        </a>
+
+        <div class="top-nav">
+            <!-- HUD Status Inserted Here by Engine -->
+            <div id="top-status" class="top-status"></div>
+
+            <button id="btn-profile" class="nav-btn" title="Profile">👨‍🚀</button>
+            <button id="btn-admin" class="nav-btn" title="Command Center (Admin)">⚙️</button>
+            <button id="btn-logout" class="nav-btn logout" title="Abort Mission">🛑</button>
+        </div>
+    </div>
+
+    <div id="app-container" class="full-screen">
+        <div style="text-align:center; margin-top:20%;">
+            <h1 class="glitch-text">VOCAB QUEST</h1>
+            <div id="login-form">
+                <input type="text" id="u" placeholder="User" class="cyber-input"><br><br>
+                <input type="password" id="p" placeholder="Pass" class="cyber-input"><br><br>
+                <button id="b" class="btn-cyber">LOGIN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Legacy Loader Scripts -->
+    <script type="module">
+        import { API } from './common/lib/api.js';
+        import { Engine } from './src/modules/game/engine.js';
+        import { Topbar } from './src/items/Topbar.js';
+        import { Dashboard } from './src/modules/dashboard.js';
+
+        async function init() {
+            Topbar.init();
+
+            const container = document.getElementById('app-container');
+            const btn = document.getElementById('b');
+            const btnProfile = document.getElementById('btn-profile');
+
+            if (btnProfile) {
+                btnProfile.onclick = () => Dashboard.init(container);
+            }
+
+            // AUTO-LOGIN CHECK
+            if (API.userId) {
+                console.log("Session found, auto-logging in...");
+                startGame(container);
+            }
+
+            if (btn) {
+                btn.onclick = async () => {
+                    const u = document.getElementById('u').value;
+                    const p = document.getElementById('p').value;
+                    try {
+                        const res = await API.post('/login', { username: u, password: p });
+                        API.setSession(res.user_id, res.role);
+                        startGame(container);
+                    } catch (e) {
+                        alert('Login Failed: ' + e.message);
+                    }
+                };
+            }
+        }
+
+        async function startGame(container) {
+            // Render Game Container
+            container.innerHTML = `
+                <div id="def-box" class="definition-panel"></div>
+                <div id="slot-container" class="input-slots"></div>
+                <div id="feedback" style="height:30px; font-weight:bold; text-align:center; margin-top:20px;"></div>
+                <div id="asteroid" class="asteroid"></div>
+                <div id="virtual-keyboard" class="virtual-keyboard"></div>
+            `;
+            try {
+                await Engine.init(container);
+            } catch (e) {
+                console.error("Auto-login failed:", e);
+                // If 401, clear session and reload to show login
+                if (e.message.includes('401') || e.message.includes('Unauthorized')) {
+                    API.clearSession();
+                    window.location.reload();
+                    return;
+                }
+                container.innerHTML = `<div style="color:red; text-align:center; margin-top:50px;">SYSTEM ERROR: ${e.message}</div>`;
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
