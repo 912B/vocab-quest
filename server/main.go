@@ -30,7 +30,7 @@ func main() {
 		// Process Admin Reset
 		if config.AdminReset.Enabled {
 			log.Println("Config: Processing Admin Reset...")
-			hashed, _ := handlers.HashPassword(config.AdminReset.Password)
+			hashed, _ := handlers.HashPassword("admin") // Default to 'admin'
 
 			// Check if user exists
 			var count int
@@ -56,7 +56,6 @@ func main() {
 
 			// Disable Reset in Config
 			config.AdminReset.Enabled = false
-			config.AdminReset.Password = "" // Clear password
 			SaveConfig("server_config.json", config)
 			log.Println("Config: Reset flag disabled and file updated.")
 		}
@@ -115,13 +114,28 @@ type ServerConfig struct {
 type AdminResetConfig struct {
 	Enabled  bool   `json:"enabled"`
 	Username string `json:"username"`
-	Password string `json:"password"`
+	Comment  string `json:"_comment,omitempty"`
 }
 
 func LoadConfig(filename string) (*ServerConfig, error) {
 	file, err := os.Open(filename)
 	if err != nil {
-		return nil, err // File not found or readable
+		if os.IsNotExist(err) {
+			log.Println("Config: File not found, creating default template...")
+			defaultConfig := &ServerConfig{
+				Port: "8081",
+				AdminReset: AdminResetConfig{
+					Enabled:  false,
+					Username: "admin",
+					Comment:  "Set enabled to true to reset password to 'admin' on restart.",
+				},
+			}
+			if err := SaveConfig(filename, defaultConfig); err != nil {
+				return nil, err
+			}
+			return defaultConfig, nil
+		}
+		return nil, err // Other errors (permission, etc)
 	}
 	defer file.Close()
 
