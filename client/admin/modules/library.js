@@ -59,6 +59,11 @@ export async function render(container) {
                     <textarea id="new-dict-desc" class="cyber-input" rows="3" placeholder="Brief description..."></textarea>
                 </div>
 
+                <div style="margin-bottom:15px; display:flex; align-items:center; gap:10px;">
+                    <input type="checkbox" id="new-dict-active" checked>
+                    <label for="new-dict-active" style="color:var(--text-dim);font-size:0.8rem; cursor:pointer;">ACTIVE (Visible in Menu)</label>
+                </div>
+
                 <div style="margin-top:20px; display:flex; gap:10px;">
                         <button id="btn-create-dict" class="btn-cyber">CREATE</button>
                         <button class="btn-cyber btn-cyber-secondary" onclick="document.getElementById('dict-create-modal').remove()">CANCEL</button>
@@ -77,7 +82,7 @@ export async function render(container) {
                 await API.post('/dictionaries', {
                     name: name,
                     description: desc,
-                    is_active: false
+                    is_active: document.getElementById('new-dict-active').checked
                 });
                 alert("Library Created.");
                 modal.remove();
@@ -124,6 +129,11 @@ export async function render(container) {
                     <textarea id="new-dict-desc" class="cyber-input" rows="3" placeholder="Brief description...">${dict.description || ''}</textarea>
                 </div>
 
+                <div style="margin-bottom:15px; display:flex; align-items:center; gap:10px;">
+                    <input type="checkbox" id="new-dict-active" ${dict.is_active ? 'checked' : ''}>
+                    <label for="new-dict-active" style="color:var(--text-dim);font-size:0.8rem; cursor:pointer;">ACTIVE (Visible in Menu)</label>
+                </div>
+
                 <div style="margin-top:20px; display:flex; gap:10px;">
                         <button id="btn-create-dict" class="btn-cyber">SAVE</button>
                         <button class="btn-cyber btn-cyber-secondary" onclick="document.getElementById('dict-create-modal').remove()">CANCEL</button>
@@ -143,7 +153,7 @@ export async function render(container) {
                     id: dict.id,
                     name: name,
                     description: desc,
-                    is_active: dict.is_active
+                    is_active: document.getElementById('new-dict-active').checked
                 };
 
                 const res = await fetch('/api/dictionaries', {
