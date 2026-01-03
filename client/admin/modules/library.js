@@ -91,6 +91,98 @@ export async function render(container) {
     window.openAddWord = () => window.openModal(null);
     window.deleteWord = deleteWord;
 
+    // Dictionary Management
+    window.editDict = (id) => {
+        const dict = state.dictionaries.find(d => d.id === id);
+        if (!dict) return;
+
+        // Reuse create modal logic or create a dedicated edit one. 
+        // For simplicity, we reuse the create structure but populate it.
+        const existing = document.getElementById('dict-create-modal');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'dict-create-modal';
+        modal.className = 'full-screen';
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.background = 'rgba(0,0,0,0.8)';
+        modal.style.zIndex = '200';
+
+        modal.innerHTML = `
+            <div class="cyber-card" style="width:95%; max-width:500px;">
+                <h3>${dict ? 'EDIT LIBRARY' : 'NEW LIBRARY'}</h3>
+                
+                <div style="margin-bottom:15px">
+                    <label style="color:var(--text-dim);font-size:0.8rem">LIBRARY NAME</label>
+                    <input type="text" id="new-dict-name" class="cyber-input" value="${dict.name}" placeholder="e.g. TOEFL Core">
+                </div>
+                
+                <div style="margin-bottom:15px">
+                    <label style="color:var(--text-dim);font-size:0.8rem">DESCRIPTION</label>
+                    <textarea id="new-dict-desc" class="cyber-input" rows="3" placeholder="Brief description...">${dict.description || ''}</textarea>
+                </div>
+
+                <div style="margin-top:20px; display:flex; gap:10px;">
+                        <button id="btn-create-dict" class="btn-cyber">SAVE</button>
+                        <button class="btn-cyber btn-cyber-secondary" onclick="document.getElementById('dict-create-modal').remove()">CANCEL</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.querySelector('#btn-create-dict').onclick = async () => {
+            const name = document.getElementById('new-dict-name').value;
+            const desc = document.getElementById('new-dict-desc').value;
+
+            if (!name) return alert("Name is required");
+
+            try {
+                const payload = {
+                    id: dict.id,
+                    name: name,
+                    description: desc,
+                    is_active: dict.is_active
+                };
+
+                const res = await fetch('/api/dictionaries', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) throw new Error(await res.text());
+
+                alert("Library Updated.");
+                modal.remove();
+                loadDictionaries();
+            } catch (e) {
+                alert("Error: " + e.message);
+            }
+        };
+    };
+
+    window.deleteDict = async (id) => {
+        if (!confirm("Are you sure? This will delete ALL words in this library!")) return;
+        try {
+            const res = await fetch(`/api/dictionaries?id=${id}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error(await res.text());
+            alert("Library Deleted.");
+            // If active was deleted, clear active
+            if (state.activeDictId === id) {
+                state.activeDictId = null;
+                document.getElementById('lib-content').innerHTML = `
+                    <div style="display:flex; justify-content:center; align-items:center; height:100%; color:var(--text-dim);">
+                        SELECT A LIBRARY TO MANAGE CONTENT
+                    </div>`;
+            }
+            loadDictionaries();
+        } catch (e) {
+            alert("Delete Failed: " + e.message);
+        }
+    };
+
     loadDictionaries();
 }
 
@@ -108,9 +200,17 @@ function renderDictList() {
     el.innerHTML = state.dictionaries.map(d => `
         <div class="nav-item ${state.activeDictId === d.id ? 'active' : ''}" 
              onclick="window.selectLibrary(${d.id})"
-             style="margin-bottom:5px; border-radius:4px; border:1px solid ${d.is_active ? 'var(--neon-green)' : 'transparent'}">
-            <div style="font-weight:bold;">${d.name}</div>
-            <div style="font-size:0.7rem; opacity:0.7">${d.words_count || 0} WORDS</div>
+             style="margin-bottom:5px; border-radius:4px; border:1px solid ${d.is_active ? 'var(--neon-green)' : 'transparent'}; display:flex; justify-content:space-between; align-items:center; padding-right:5px;">
+            <div>
+                <div style="font-weight:bold;">${d.name}</div>
+                <div style="font-size:0.7rem; opacity:0.7">${d.words_count || 0} WORDS</div>
+            </div>
+            <div style="display:flex; gap:5px;">
+                 <button style="background:none; border:none; cursor:pointer; font-size:1rem; padding:2px; opacity:0.7; transition:opacity 0.2s;" 
+                    onclick="event.stopPropagation(); window.editDict(${d.id})" title="Edit">✏️</button>
+                 <button style="background:none; border:none; cursor:pointer; font-size:1rem; padding:2px; color:var(--neon-red); opacity:0.7; transition:opacity 0.2s;" 
+                    onclick="event.stopPropagation(); window.deleteDict(${d.id})" title="Delete">🗑️</button>
+            </div>
         </div>
     `).join('');
 }
@@ -144,18 +244,18 @@ function renderWordTable(container, dictId) {
     const dict = state.dictionaries.find(d => d.id === dictId);
 
     let html = `
-            <div>
+        <div>
                 <h2 style="margin:0; font-size:1.5rem; color:#fff">${dict.name}</h2>
                 <div style="font-size:0.8rem; color:var(--text-dim)">${dict.description}</div>
             </div>
-            <div style="display:flex; gap:10px;">
-                <!-- Excel Upload -->
-                <input type="file" id="inp-excel" accept=".xlsx" style="display:none" onchange="window.uploadExcel(this)">
+        <div style="display:flex; gap:10px;">
+            <!-- Excel Upload -->
+            <input type="file" id="inp-excel" accept=".xlsx" style="display:none" onchange="window.uploadExcel(this)">
                 <button class="btn-cyber btn-cyber-secondary" onclick="document.getElementById('inp-excel').click()">📄 UPLOAD EXCEL</button>
                 <button class="btn-cyber" onclick="window.openAddWord()">+ ADD ENTRY</button>
-            </div>
         </div>
-        
+        </div>
+
         <div style="flex:1; overflow-y:auto;">
             <table class="word-table" style="width:100%; border-collapse:collapse;">
                 <thead style="position:sticky; top:0; background:var(--panel-bg);">
@@ -199,10 +299,10 @@ function renderWordTable(container, dictId) {
 
         // Strategy: We inject the ID into the DOM of the modal when opening.
         // OR we just use a closure here for the current editing word.
-        // But `window.saveWord` is called by the HTML button `onclick="saveWord()"`.
+        // But `window.saveWord` is called by the HTML button `onclick = "saveWord()"`.
         // So we need to override that global function.
 
-        // Let's assume the modal inputs are `inp-word`, etc.
+        // Let's assume the modal inputs are `inp - word`, etc.
         // We need to know IF we are editing.
         // Hack: Check if `editingWordId` variable on window exists? No.
 

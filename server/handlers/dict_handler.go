@@ -53,7 +53,9 @@ func (h *DictHandler) List(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(map[string]bool{"success": true})
 
 	} else if r.Method == "PUT" {
 		var d models.Dictionary
@@ -67,7 +69,9 @@ func (h *DictHandler) List(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]bool{"success": true})
 
 	} else if r.Method == "DELETE" {
 		idStr := r.URL.Query().Get("id")
@@ -81,7 +85,9 @@ func (h *DictHandler) List(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]bool{"success": true})
 	}
 }
 
@@ -127,7 +133,9 @@ func (h *DictHandler) SetActive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tx.Commit()
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]bool{"success": true})
 }
 
 // Get Words of a Dictionary
